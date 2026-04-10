@@ -1,0 +1,81 @@
+services:
+
+  # ZOOKEEPER - Coordinateur dont Kafka a besoin pour fonctionner
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    restart: unless-stopped
+
+  # KAFKA - File d'attente pour les données temps réel de l'API JCDecaux
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: unless-stopped
+
+  # NAMENODE - Le chef de HDFS, sait où sont stockés tous les fichiers
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    environment:
+      CLUSTER_NAME: test
+    ports:
+      - "9870:9870"
+    volumes:
+      - ./mapreduce:/opt/mapreduce
+      - ./data:/opt/data
+    restart: unless-stopped
+
+  # DATANODE - Stocke les données réelles de HDFS
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    restart: unless-stopped
+
+  # RESOURCEMANAGER - Distribue et planifie les jobs MapReduce
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+    container_name: resourcemanager
+    ports:
+      - "8088:8088"
+    restart: unless-stopped
+
+  # NODEMANAGER - Exécute les mappers et reducers
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+    container_name: nodemanager
+    volumes:
+      - ./mapreduce:/opt/mapreduce
+      - ./data:/opt/data
+    restart: unless-stopped
+
+  # HIVE - SQL sur HDFS (serveur + metastore + PostgreSQL intégrés)
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-server
+    depends_on:
+      - namenode
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    restart: unless-stopped
+
+  # ATLAS - Gouvernance et traçabilité des données (UI: localhost:21000 admin/admin)
+  atlas:
+    image: sburn/apache-atlas:2.3.0
+    container_name: atlas
+    ports:
+      - "21000:21000"
+    restart: unless-stopped
