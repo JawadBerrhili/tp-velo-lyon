@@ -29,7 +29,7 @@ def emit(station_id, load_factors, valid_samples, total_samples):
     else:
         std = 0.0
 
-    print(f"{station_id}\t{avg:.2f}\t{std:.2f}\t{valid_samples}/{total_samples}")
+    print("{}\t{:.2f}\t{:.2f}\t{}/{}".format(station_id, avg, std, valid_samples, total_samples))
 
 for line in sys.stdin:
     line = line.strip()

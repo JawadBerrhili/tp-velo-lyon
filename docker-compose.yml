@@ -29,6 +29,7 @@ services:
     container_name: namenode
     environment:
       CLUSTER_NAME: test
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
     ports:
       - "9870:9870"
     volumes:
@@ -41,24 +42,35 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
     environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
       SERVICE_PRECONDITION: "namenode:9870"
+    depends_on:
+      - namenode
     restart: unless-stopped
 
   # RESOURCEMANAGER - Distribue et planifie les jobs MapReduce
   resourcemanager:
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
     ports:
       - "8088:8088"
+    depends_on:
+      - namenode
     restart: unless-stopped
 
   # NODEMANAGER - Exécute les mappers et reducers
   nodemanager:
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
     volumes:
       - ./mapreduce:/opt/mapreduce
       - ./data:/opt/data
+    depends_on:
+      - resourcemanager
     restart: unless-stopped
 
   # HIVE - SQL sur HDFS (serveur + metastore + PostgreSQL intégrés)
@@ -67,6 +79,8 @@ services:
     container_name: hive-server
     depends_on:
       - namenode
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
     ports:
       - "10000:10000"
       - "10002:10002"

@@ -47,4 +47,4 @@ for line in sys.stdin:
     timestamp = int(last_update / 1000)
 
     # Sortie tab-separated comme demandé par le brief
-    print(f"{station_id}\t{timestamp}\t{load_factor}\t{status_valide}")
+    print("{}\t{}\t{}\t{}".format(station_id, timestamp, load_factor, status_valide))

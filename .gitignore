@@ -10,3 +10,5 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+data/stations_lines.json
