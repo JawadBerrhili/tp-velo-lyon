@@ -73,14 +73,26 @@ services:
       - resourcemanager
     restart: unless-stopped
 
-  # HIVE - SQL sur HDFS (serveur + metastore + PostgreSQL intégrés)
+  # HIVE - SQL sur HDFS
   hive-server:
-    image: bde2020/hive:2.3.2-postgresql-metastore
+    image: apache/hive:3.1.3
     container_name: hive-server
     depends_on:
       - namenode
     environment:
-      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      SERVICE_NAME: hiveserver2
+      HIVE_SERVER2_THRIFT_PORT: 10000
+      IS_RESUME: "true"
+      DB_DRIVER: derby
+      SERVICE_OPTS: >-
+        -Dfs.defaultFS=hdfs://namenode:9000
+        -Dhadoop.proxyuser.root.hosts=*
+        -Dhadoop.proxyuser.root.groups=*
+        -Dhadoop.proxyuser.hive.hosts=*
+        -Dhadoop.proxyuser.hive.groups=*
+        -Dhive.metastore.schema.verification=false
+        -Ddatanucleus.schema.autoCreateAll=true
+        -Dhive.metastore.uris=
     ports:
       - "10000:10000"
       - "10002:10002"
@@ -93,3 +105,4 @@ services:
     ports:
       - "21000:21000"
     restart: unless-stopped
+
