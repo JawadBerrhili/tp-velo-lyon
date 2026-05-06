@@ -12,3 +12,4 @@ venv/
 .idea/
 
 data/stations_lines.json
+data/kafka_collected.json
