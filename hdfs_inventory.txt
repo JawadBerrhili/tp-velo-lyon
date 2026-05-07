@@ -1,0 +1,17 @@
+drwxr-xr-x   - root supergroup          0 2026-05-06 07:39 /data-lake/analytics
+drwxr-xr-x   - root supergroup          0 2026-05-06 13:01 /data-lake/processed
+drwxr-xr-x   - root supergroup          0 2026-05-06 13:01 /data-lake/processed/anomalies
+-rw-r--r--   3 root supergroup          0 2026-05-06 13:01 /data-lake/processed/anomalies/_SUCCESS
+-rw-r--r--   3 root supergroup       9552 2026-05-06 13:01 /data-lake/processed/anomalies/part-00000
+drwxr-xr-x   - root supergroup          0 2026-05-06 13:01 /data-lake/processed/heatmap
+-rw-r--r--   3 root supergroup          0 2026-05-06 13:01 /data-lake/processed/heatmap/_SUCCESS
+-rw-r--r--   3 root supergroup        239 2026-05-06 13:01 /data-lake/processed/heatmap/part-00000
+drwxr-xr-x   - root supergroup          0 2026-05-06 13:01 /data-lake/processed/horaire_quartier
+-rw-r--r--   3 root supergroup          0 2026-05-06 13:01 /data-lake/processed/horaire_quartier/_SUCCESS
+-rw-r--r--   3 root supergroup        472 2026-05-06 13:01 /data-lake/processed/horaire_quartier/part-00000
+drwxr-xr-x   - root supergroup          0 2026-05-06 13:00 /data-lake/processed/load_metrics
+-rw-r--r--   3 root supergroup          0 2026-05-06 13:00 /data-lake/processed/load_metrics/_SUCCESS
+-rw-r--r--   3 root supergroup       9439 2026-05-06 12:59 /data-lake/processed/load_metrics/part-00000
+drwxr-xr-x   - root supergroup          0 2026-05-06 07:39 /data-lake/raw
+drwxr-xr-x   - root supergroup          0 2026-05-06 12:58 /data-lake/raw/velo_lyon
+-rw-r--r--   3 root supergroup    7009773 2026-05-06 12:58 /data-lake/raw/velo_lyon/kafka_collected.json
