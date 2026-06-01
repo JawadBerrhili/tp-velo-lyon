@@ -1,0 +1,49 @@
+{
+  "description": "Déclaration des entités Atlas - Data Lake Vélo Lyon",
+  "note": "Entités à enregistrer via POST /api/atlas/v2/entity/bulk",
+  "datasets": [
+    {
+      "name": "raw_velo_stations",
+      "description": "Données brutes des stations Vélo'v Lyon collectées depuis l'API JCDecaux toutes les 60 secondes via Kafka",
+      "path": "hdfs://namenode:9000/data-lake/raw/velo_lyon/",
+      "source": "API JCDecaux (https://api.jcdecaux.com/vls/v1/stations?contract=Lyon)",
+      "format": "JSON (un objet par ligne)",
+      "frequence": "Toutes les 60 secondes",
+      "classification_rgpd": "Données publiques. Aucune donnée personnelle. L'API fournit uniquement des données de stations (localisation, disponibilité). Aucun identifiant d'usager.",
+      "retention": "30 jours"
+    },
+    {
+      "name": "processed_load_factor",
+      "description": "Métriques de taux de remplissage par station calculées par le job MapReduce MR1 (moyenne, écart-type, ratio échantillons valides)",
+      "path": "hdfs://namenode:9000/data-lake/processed/load_metrics/",
+      "source": "Job MR1 (mapper_load_factor.py + reducer_load_factor.py) sur raw_velo_stations",
+      "format": "TSV (tab-separated values)",
+      "frequence": "Batch (à chaque exécution du job MR1)",
+      "classification_rgpd": "Données publiques. Métriques agrégées dérivées de données publiques.",
+      "retention": "7 jours"
+    },
+    {
+      "name": "curated_quartiers",
+      "description": "Agrégats stratégiques par quartier : heatmap CA potentiel (MR4) et pics de demande horaire/quartier (MR3)",
+      "path": "hdfs://namenode:9000/data-lake/processed/heatmap/ et /data-lake/processed/horaire_quartier/",
+      "source": "Jobs MR3 (mapper_horaire.py + reducer_horaire.py) et MR4 (mapper_heatmap.py + reducer_heatmap.py)",
+      "format": "TSV (tab-separated values)",
+      "frequence": "Batch",
+      "classification_rgpd": "Données publiques. Agrégats par quartier, aucune donnée individuelle.",
+      "retention": "Permanent (données stratégiques pour la direction)"
+    }
+  ],
+  "lineage": {
+    "description": "Chaîne de traçabilité complète des données",
+    "flux": [
+      "API JCDecaux → Kafka Producer (producer.py) → Topic velo_lyon_raw",
+      "Topic velo_lyon_raw → Kafka Consumer (consumer.py) → kafka_collected.json",
+      "kafka_collected.json → HDFS /data-lake/raw/velo_lyon/",
+      "HDFS raw → MR1 → /data-lake/processed/load_metrics/",
+      "HDFS raw → MR2 → /data-lake/processed/anomalies/",
+      "HDFS raw → MR3 → /data-lake/processed/horaire_quartier/",
+      "HDFS raw → MR4 → /data-lake/processed/heatmap/",
+      "HDFS processed → Hive tables externes → Requêtes SQL métier"
+    ]
+  }
+}
